@@ -98,12 +98,12 @@ public class PullToRefreshLayout extends FrameLayout {
         super.onNestedPreScroll(target, dx, dy, consumed);
         int spinnerDy = (int) calculateDistanceY(target, dy);
         if (!isConfirm) {
-            if (spinnerDy < 0 && mHeaderView != null && !canBodyScrollUp()) {
+            if (spinnerDy < 0 && mHeaderView != null && canBodyScrollUp()) {
                 mCurrentAction = PULL_REFRESH;
                 isConfirm = true;
                 if (mOnPullToChangeListener != null)
                     isFollowUp = mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaStatus.START);
-            } else if (spinnerDy > 0 && mFooterView != null && !canBodyScrollDown() && !mRefreshing) {
+            } else if (spinnerDy > 0 && mFooterView != null && canBodyScrollDown() && !mRefreshing) {
                 mCurrentAction = LOAD_MORE;
                 isConfirm = true;
                 if (mOnPullToChangeListener != null)
@@ -112,11 +112,11 @@ public class PullToRefreshLayout extends FrameLayout {
         }
 
         if (moveSpinner(-spinnerDy)) {
-            if (mHeaderView != null && !canBodyScrollUp()
+            if (mHeaderView != null && canBodyScrollUp()
                     && mBodyView.getTranslationY() > 0
                     && dy > 0) {
                 consumed[1] += dy;
-            } else if (mFooterView != null && !canBodyScrollDown()
+            } else if (mFooterView != null && canBodyScrollDown()
                     && mBodyView.getTranslationY() < 0
                     && dy < 0) {
                 consumed[1] += dy;
@@ -157,7 +157,7 @@ public class PullToRefreshLayout extends FrameLayout {
         if (mRefreshing) {
             return false;
         }
-        if (mHeaderView != null && !canBodyScrollUp() && mCurrentAction == PULL_REFRESH) {
+        if (mHeaderView != null && canBodyScrollUp() && mCurrentAction == PULL_REFRESH) {
             LayoutParams lp = (LayoutParams) mHeaderView.getLayoutParams();
             lp.height += distanceY;
             if (lp.height < 0) {
@@ -170,7 +170,7 @@ public class PullToRefreshLayout extends FrameLayout {
             mHeaderView.setLayoutParams(lp);
             mBodyView.setTranslationY(lp.height);
             return true;
-        } else if (mFooterView != null && !canBodyScrollDown() && mCurrentAction == LOAD_MORE) {
+        } else if (mFooterView != null && canBodyScrollDown() && mCurrentAction == LOAD_MORE) {
             LayoutParams lp = (LayoutParams) mFooterView.getLayoutParams();
             lp.height -= distanceY;
             if (lp.height < 0) {
@@ -273,12 +273,12 @@ public class PullToRefreshLayout extends FrameLayout {
 
     private boolean canBodyScrollUp() {
         if (mBodyView == null) return false;
-        return mBodyView.canScrollVertically(-1);
+        return !mBodyView.canScrollVertically(-1);
     }
 
     private boolean canBodyScrollDown() {
         if (mBodyView == null) return false;
-        return mBodyView.canScrollVertically(1);
+        return !mBodyView.canScrollVertically(1);
     }
 
     /**
