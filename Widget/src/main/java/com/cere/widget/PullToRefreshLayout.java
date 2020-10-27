@@ -312,8 +312,8 @@ public class PullToRefreshLayout extends FrameLayout {
      * @param refreshing 刷新状态
      */
     public void setRefreshing(boolean refreshing) {
+        mRefreshing = refreshing;
         if (!refreshing) {
-            mRefreshing = refreshing;
             handlerAction();
         }
     }
