@@ -23,13 +23,14 @@ public class BottomSheetLayout extends FrameLayout {
      */
     private int state = -1;
     /**
-     * 折叠状态
+     * 折叠状态 {@value}
      */
     public static final int STATE_COLLAPSED = -1;
     /**
-     * 展开状态
+     * 展开状态 {@value}
      */
     public static final int STATE_EXPANSION = 1;
+
     private OnBottomSheetStateChangeListener mChangeListener;
 
     public BottomSheetLayout(Context context, AttributeSet attrs) {

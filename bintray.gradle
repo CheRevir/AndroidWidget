@@ -7,7 +7,7 @@ def gitUrl = 'git@github.com:CheRevir/AndroidWidget.git'    // # Git仓库的url
 def issueUrl = 'https://github.com/CheRevir/AndroidWidget/issues' // # Git仓库issues的url
 
 //参考 compile 'groupId:artifactId:version'，groupId就是group version下面的版本
-def artifact_version='1.0.0' //groupId
+def artifact_version='1.0.1' //groupId
 def artifact_group = 'com.cere' // # 发布版本号
 def artifact_id = 'widget' // # artifactId
 def projectName = 'AndroidWidget' // #这个是显示在bintray 仓库中的项目名字，一般可用项目名称
@@ -16,7 +16,7 @@ def projectName = 'AndroidWidget' // #这个是显示在bintray 仓库中的项�
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-group = artifact_group
+//group = artifact_group
 version = artifact_version
 
 bintray {

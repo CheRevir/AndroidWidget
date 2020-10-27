@@ -55,12 +55,12 @@ public class PullToRefreshLayout extends FrameLayout {
     }
 
     @Override
-    public boolean onStartNestedScroll(@NonNull View child, @NonNull View target, int nestedScrollAxes) {
+    public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
         return isEnabled() && !mRefreshing && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
 
     @Override
-    public void onStopNestedScroll(@NonNull View child) {
+    public void onStopNestedScroll(View child) {
         super.onStopNestedScroll(child);
         if (mCurrentAction == INVALID) {
             handlerAction();
@@ -94,16 +94,16 @@ public class PullToRefreshLayout extends FrameLayout {
     }
 
     @Override
-    public void onNestedPreScroll(@NonNull View target, int dx, int dy, @NonNull int[] consumed) {
+    public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
         super.onNestedPreScroll(target, dx, dy, consumed);
         int spinnerDy = (int) calculateDistanceY(target, dy);
         if (!isConfirm) {
-            if (spinnerDy < 0 && mHeaderView != null && canBodyScrollUp()) {
+            if (spinnerDy < 0 && mHeaderView != null && canBodyScrollDown()) {
                 mCurrentAction = PULL_REFRESH;
                 isConfirm = true;
                 if (mOnPullToChangeListener != null)
                     isFollowUp = mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaStatus.START);
-            } else if (spinnerDy > 0 && mFooterView != null && canBodyScrollDown() && !mRefreshing) {
+            } else if (spinnerDy > 0 && mFooterView != null && canBodyScrollUp() && !mRefreshing) {
                 mCurrentAction = LOAD_MORE;
                 isConfirm = true;
                 if (mOnPullToChangeListener != null)
@@ -112,11 +112,11 @@ public class PullToRefreshLayout extends FrameLayout {
         }
 
         if (moveSpinner(-spinnerDy)) {
-            if (mHeaderView != null && canBodyScrollUp()
+            if (mHeaderView != null && canBodyScrollDown()
                     && mBodyView.getTranslationY() > 0
                     && dy > 0) {
                 consumed[1] += dy;
-            } else if (mFooterView != null && canBodyScrollDown()
+            } else if (mFooterView != null && canBodyScrollUp()
                     && mBodyView.getTranslationY() < 0
                     && dy < 0) {
                 consumed[1] += dy;
@@ -144,7 +144,7 @@ public class PullToRefreshLayout extends FrameLayout {
         }
     }
 
-    private double calculateDistanceY(@NonNull View target, int dy) {
+    private double calculateDistanceY(View target, int dy) {
         int viewHeight = target.getMeasuredHeight();
         double ratio = (viewHeight - Math.abs(target.getY())) / 1.0d / viewHeight * mDamping;
         if (ratio <= 0.01d) {
@@ -157,7 +157,7 @@ public class PullToRefreshLayout extends FrameLayout {
         if (mRefreshing) {
             return false;
         }
-        if (mHeaderView != null && canBodyScrollUp() && mCurrentAction == PULL_REFRESH) {
+        if (mHeaderView != null && canBodyScrollDown() && mCurrentAction == PULL_REFRESH) {
             LayoutParams lp = (LayoutParams) mHeaderView.getLayoutParams();
             lp.height += distanceY;
             if (lp.height < 0) {
@@ -170,7 +170,7 @@ public class PullToRefreshLayout extends FrameLayout {
             mHeaderView.setLayoutParams(lp);
             mBodyView.setTranslationY(lp.height);
             return true;
-        } else if (mFooterView != null && canBodyScrollDown() && mCurrentAction == LOAD_MORE) {
+        } else if (mFooterView != null && canBodyScrollUp() && mCurrentAction == LOAD_MORE) {
             LayoutParams lp = (LayoutParams) mFooterView.getLayoutParams();
             lp.height -= distanceY;
             if (lp.height < 0) {
@@ -271,14 +271,14 @@ public class PullToRefreshLayout extends FrameLayout {
         animator.start();
     }
 
-    private boolean canBodyScrollUp() {
-        if (mBodyView == null) return false;
-        return !mBodyView.canScrollVertically(-1);
-    }
-
     private boolean canBodyScrollDown() {
         if (mBodyView == null) return false;
-        return !mBodyView.canScrollVertically(1);
+        return mBodyView.canScrollVertically(1);
+    }
+
+    private boolean canBodyScrollUp() {
+        if (mBodyView == null) return false;
+        return mBodyView.canScrollVertically(-1);
     }
 
     /**
