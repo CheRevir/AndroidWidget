@@ -3,14 +3,10 @@ Android自定义控件。
 
 # Layout
 
-
-
 | Name                | Description                                              |
 | ------------------- | -------------------------------------------------------- |
 | PullToRefreshLayout | 一个简单的下拉刷新，上拉加载库，通过NestedScroll实现。   |
 | BottomSheetLayout   | 一个简单的BottomSheet布局，通过setTranslationY方法实现。 |
-
-
 
 # 使用
 
