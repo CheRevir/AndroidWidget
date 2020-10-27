@@ -1,0 +1,125 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+//上传到Jcenter 相关配置   以下配置都需要修改成自己的数据
+def siteUrl = 'https://github.com/CheRevir/AndroidWidget'    // # 项目的主页
+def gitUrl = 'git@github.com:CheRevir/AndroidWidget.git'    // # Git仓库的url
+def issueUrl = 'https://github.com/CheRevir/AndroidWidget/issues' // # Git仓库issues的url
+
+//参考 compile 'groupId:artifactId:version'，groupId就是group version下面的版本
+def artifact_version='1.0.0' //groupId
+def artifact_group = 'com.cere' // # 发布版本号
+def artifact_id = 'widget' // # artifactId
+def projectName = 'AndroidWidget' // #这个是显示在bintray 仓库中的项目名字，一般可用项目名称
+
+// 这里是读取Bintray相关的信息，我们上传项目到github上的时候会把gradle文件传上去，所以不要把帐号密码的信息直接写在这里，写在local.properties中，这里动态读取。
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+group = artifact_group
+version = artifact_version
+
+bintray {
+    user = properties.getProperty("bintray.user") // Bintray的用户名。
+    key = properties.getProperty("bintray.apikey") // Bintray刚才保存的ApiKey。
+    override = true
+    configurations = ['archives']
+    pkg {
+        repo = "maven"// 你要上传的库的名字  需要和建仓库用的名字一致,即在组下面建立的仓库名称
+        name = projectName    //这个是显示在bintray 仓库中的项目名字，一般可用项目名称
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = issueUrl
+        userOrg = properties.getProperty("bintray.user") //组织名/用户名  需要和建组织用的名字一致
+        //自己创建的organization名称，一定要全是小写字母，即使当时创建的名称含有大写，这里全部转换为小写，否则404
+        licenses = ['Apache-2.0']//不能随便写，只能是仓库创建时选择的license type
+        publish = true// 是否是公开项目，公开别人可以引用
+        version {
+            name = artifact_version //Bintray logical version name
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name projectName
+            description 'Android自定义控件。'
+            url siteUrl
+            inceptionYear '2020'
+
+            packaging 'aar'
+            groupId artifact_group
+            artifactId artifact_id
+            version artifact_version
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+            scm {
+                connection gitUrl
+                developerConnection gitUrl
+                url siteUrl
+            }
+            developers {
+                developer {
+                    //开发者的个人信息
+                    id 'CheRevir'
+                    name 'CheRevir'
+                    email 'CheRevir@gmail.com'
+                }
+            }
+        }
+    }
+}
+
+if (project.getPlugins().hasPlugin('com.android.application') || project.getPlugins().hasPlugin('com.android.library')) {
+    println('--------android--------')
+    //android  javadoc和sources文件的生成
+    task sourcesJar(type: Jar) {
+        from android.sourceSets.main.java.srcDirs
+        classifier = 'sources'
+    }
+    task javadoc(type: Javadoc) {
+        failOnError false //必须添加以免出错
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+} else {
+    println('--------java--------')
+    //java  javadoc和sources文件的生成
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+//在构建生成的时候有可能会报GBK编码等错误，可能需要添加UTF-8声明，如下：
+javadoc {
+    options {
+        //如果你的项目里面有中文注释的话，必须将格式设置为UTF-8，不然会出现乱码
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
+}

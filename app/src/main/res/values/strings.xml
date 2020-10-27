@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">AndroidWidget</string>
+    <string name="hello_world">Hello Square World!</string>
+</resources>
