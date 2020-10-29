@@ -35,6 +35,7 @@ public class PullToRefreshLayout extends FrameLayout {
     private static final int PULL_REFRESH = 0;
     private static final int LOAD_MORE = 1;
     private float mDamping = 0.12f;
+    private boolean canScrollDown = false;
 
     public PullToRefreshLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -71,7 +72,7 @@ public class PullToRefreshLayout extends FrameLayout {
             mRefreshing = true;
             if (isFollowUp && mOnPullToChangeListener != null) {
                 isTrigger = true;
-                if (!mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaStatus.TRIGGER)) {
+                if (!mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaState.TRIGGER)) {
                     handlerAction();
                 }
             } else {
@@ -82,7 +83,7 @@ public class PullToRefreshLayout extends FrameLayout {
             mRefreshing = true;
             if (isFollowUp && mOnPullToChangeListener != null) {
                 isTrigger = true;
-                if (!mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaStatus.TRIGGER)) {
+                if (!mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaState.TRIGGER)) {
                     handlerAction();
                 }
             } else {
@@ -102,12 +103,12 @@ public class PullToRefreshLayout extends FrameLayout {
                 mCurrentAction = PULL_REFRESH;
                 isConfirm = true;
                 if (mOnPullToChangeListener != null)
-                    isFollowUp = mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaStatus.START);
+                    isFollowUp = mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaState.START);
             } else if (spinnerDy > 0 && mFooterView != null && canBodyScrollUp() && !mRefreshing) {
                 mCurrentAction = LOAD_MORE;
                 isConfirm = true;
                 if (mOnPullToChangeListener != null)
-                    isFollowUp = mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaStatus.START);
+                    isFollowUp = mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaState.START);
             }
         }
 
@@ -213,14 +214,14 @@ public class PullToRefreshLayout extends FrameLayout {
             @Override
             public void onAnimationStart(Animator animation) {
                 if (isFollowUp && isTrigger && mOnPullToChangeListener != null)
-                    mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaStatus.DONE);
+                    mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaState.DONE);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 mRefreshing = false;
                 if (isFollowUp && isTrigger && mOnPullToChangeListener != null)
-                    mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaStatus.END);
+                    mOnPullToChangeListener.onChange(PullToLocation.HEADER, PullTaState.END);
                 isTrigger = false;
             }
 
@@ -248,14 +249,14 @@ public class PullToRefreshLayout extends FrameLayout {
             @Override
             public void onAnimationStart(Animator animation) {
                 if (isFollowUp && isTrigger && mOnPullToChangeListener != null)
-                    mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaStatus.DONE);
+                    mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaState.DONE);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 mRefreshing = false;
                 if (isFollowUp && isTrigger && mOnPullToChangeListener != null)
-                    mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaStatus.END);
+                    mOnPullToChangeListener.onChange(PullToLocation.FOOTER, PullTaState.END);
                 isTrigger = false;
             }
 
@@ -273,12 +274,22 @@ public class PullToRefreshLayout extends FrameLayout {
 
     private boolean canBodyScrollDown() {
         if (mBodyView == null) return false;
+        if (canScrollDown) return true;
         return mBodyView.canScrollVertically(1);
     }
 
     private boolean canBodyScrollUp() {
         if (mBodyView == null) return false;
         return mBodyView.canScrollVertically(-1);
+    }
+
+    /**
+     * 设置能够往下滚动
+     *
+     * @param canScrollDown - Default false
+     */
+    public void setCanScrollDown(boolean canScrollDown) {
+        this.canScrollDown = canScrollDown;
     }
 
     /**
@@ -335,10 +346,10 @@ public class PullToRefreshLayout extends FrameLayout {
          * 拖动发生变化
          *
          * @param location 哪个方向拖动
-         * @param status   拖动状态
+         * @param state    拖动状态
          * @return 是否监听后续状态变化
          */
-        boolean onChange(@NonNull PullToLocation location, @NonNull PullTaStatus status);
+        boolean onChange(@NonNull PullToLocation location, @NonNull PullTaState state);
     }
 
     public enum PullToLocation {
@@ -352,7 +363,7 @@ public class PullToRefreshLayout extends FrameLayout {
         FOOTER
     }
 
-    public enum PullTaStatus {
+    public enum PullTaState {
         /**
          * 拖动开始
          */

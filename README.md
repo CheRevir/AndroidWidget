@@ -14,7 +14,7 @@ Android自定义控件。
 
 ~~~groovy
 dependencies {
-    implementation 'com.cere:widget:1.0.1'
+    implementation 'com.cere:widget:1.0.3'
 }
 ~~~
 

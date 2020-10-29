@@ -68,7 +68,7 @@ public class BottomSheetLayout extends FrameLayout {
         }
     }
 
-    private void collapsed() {
+    private void collapsed(boolean anim) {
         state = STATE_COLLAPSED;
         ValueAnimator animator = ValueAnimator.ofInt(height, 0);
         animator.addUpdateListener(animation -> {
@@ -84,12 +84,13 @@ public class BottomSheetLayout extends FrameLayout {
                 }
             }
         });
-        animator.setDuration(500);
+        if (anim) animator.setDuration(500);
+        else animator.setDuration(0);
         animator.start();
         if (mChangeListener != null) mChangeListener.onBottomSheetStateChange(state);
     }
 
-    private void expansion() {
+    private void expansion(boolean anim) {
         state = STATE_EXPANSION;
         ValueAnimator animator = ValueAnimator.ofInt(0, height);
         animator.addUpdateListener(animation -> {
@@ -105,7 +106,8 @@ public class BottomSheetLayout extends FrameLayout {
                 }
             }
         });
-        animator.setDuration(500);
+        if (anim) animator.setDuration(500);
+        else animator.setDuration(0);
         animator.start();
         if (mChangeListener != null) mChangeListener.onBottomSheetStateChange(state);
     }
@@ -134,10 +136,20 @@ public class BottomSheetLayout extends FrameLayout {
      * @param state {@link #STATE_COLLAPSED}, {@link #STATE_EXPANSION}
      */
     public void setState(int state) {
+        setState(state, true);
+    }
+
+    /**
+     * 设置折叠/展开
+     *
+     * @param state {@link #STATE_COLLAPSED}, {@link #STATE_EXPANSION}
+     * @param anim  是否执行动画
+     */
+    public void setState(int state, boolean anim) {
         if (state == STATE_COLLAPSED) {
-            collapsed();
+            collapsed(anim);
         } else if (state == STATE_EXPANSION) {
-            expansion();
+            expansion(anim);
         } else {
             throw new IllegalArgumentException("BottomSheet state unknown " + state);
         }

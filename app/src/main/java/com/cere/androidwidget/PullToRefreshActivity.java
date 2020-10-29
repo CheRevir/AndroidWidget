@@ -25,32 +25,34 @@ public class PullToRefreshActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ArrayList<String> list = new ArrayList<>(20);
-        for (int i = 0; i < 20; i++) {
-            list.add("adfasdf" + String.valueOf(i));
+        for (int i = 0; i < 1; i++) {
+            list.add("adfasdf" + i);
         }
+
         Adapter adapter = new Adapter(this, list);
         recyclerView.setAdapter(adapter);
 
         PullToRefreshLayout layout = findViewById(R.id.refresh);
         /*layout.setPullToHeight(100);
         layout.setDamping(0.1f);*/
+        if (list.size() < 10) {
+            layout.setCanScrollDown(true);
+        }
         ImageView im = findViewById(R.id.header_image);
         TextView tv = findViewById(R.id.header_text);
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.rotate);
         layout.setOnPullToChangeListener((location, status) -> {
             if (location == PullToRefreshLayout.PullToLocation.HEADER) {
                 Log.e("TAG", "MainActivity -> onCreate: " + status);
-                if (status == PullToRefreshLayout.PullTaStatus.START || status == PullToRefreshLayout.PullTaStatus.END) {
+                if (status == PullToRefreshLayout.PullTaState.START || status == PullToRefreshLayout.PullTaState.END) {
                     im.clearAnimation();
                     im.setImageResource(R.drawable.ic_drop_down);
                     tv.setText("下拉刷新");
-                } else if (status == PullToRefreshLayout.PullTaStatus.TRIGGER) {
+                } else if (status == PullToRefreshLayout.PullTaState.TRIGGER) {
                     im.setImageResource(R.drawable.ic_refresh);
                     im.startAnimation(animation);
                     tv.setText("正在刷新");
-                    new Handler().postDelayed(() -> {
-                        layout.setRefreshing(false);
-                    }, 3000);
+                    new Handler().postDelayed(() -> layout.setRefreshing(false), 3000);
                     return true;
                 } else {
                     im.clearAnimation();
@@ -58,7 +60,7 @@ public class PullToRefreshActivity extends AppCompatActivity {
                 }
                 return true;
             } else {
-                if (status == PullToRefreshLayout.PullTaStatus.START) {
+                if (status == PullToRefreshLayout.PullTaState.START) {
                     layout.setRefreshing(false);
                 }
                 Log.e("TAG", "MainActivity -> onCreate: Footer: " + status);

@@ -1,22 +1,19 @@
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-//上传到Jcenter 相关配置   以下配置都需要修改成自己的数据
 def siteUrl = 'https://github.com/CheRevir/AndroidWidget'    // # 项目的主页
 def gitUrl = 'git@github.com:CheRevir/AndroidWidget.git'    // # Git仓库的url
 def issueUrl = 'https://github.com/CheRevir/AndroidWidget/issues' // # Git仓库issues的url
 
-//参考 compile 'groupId:artifactId:version'，groupId就是group version下面的版本
-def artifact_version='1.0.1' //groupId
+def artifact_version='1.0.3' //groupId
 def artifact_group = 'com.cere' // # 发布版本号
 def artifact_id = 'widget' // # artifactId
 def projectName = 'AndroidWidget' // #这个是显示在bintray 仓库中的项目名字，一般可用项目名称
 
-// 这里是读取Bintray相关的信息，我们上传项目到github上的时候会把gradle文件传上去，所以不要把帐号密码的信息直接写在这里，写在local.properties中，这里动态读取。
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-//group = artifact_group
+group = artifact_group
 version = artifact_version
 
 bintray {
